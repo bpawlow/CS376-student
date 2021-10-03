@@ -191,15 +191,15 @@ namespace Assets.Serialization
                     $"Expected a type name (a string) in 'type: ...' expression for object id {id}, but instead got {typeName}");
 
             // Great!  Now what?
-            object ReadObject = Utilities.MakeInstance(type);
-            idObject[id] = ReadObject;
+            object outputObject = Utilities.MakeInstance(type);
+            idObject[id] = outputObject;
 
             // Read the fields until we run out of them
             while (!End && PeekChar != '}')
             {
                 var (field, value) = ReadField(id);
                 // We've got a field and a value.  Now what?
-                Utilities.SetFieldByName(ReadObject, field, value);
+                Utilities.SetFieldByName(outputObject, field, value);
             }
 
             if (End)
@@ -208,7 +208,7 @@ namespace Assets.Serialization
             GetChar();  // Swallow close bracket
 
             // We're done.  Now what?
-            return ReadObject;
+            return outputObject;
         }
     }
 }
