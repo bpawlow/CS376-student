@@ -89,7 +89,7 @@ namespace Assets.Serialization
             }
             else
             {
-                objectSerialNumbers.Add(o, availableSerialNum);
+                objectSerialNumbers[o] = availableSerialNum;
                 availableSerialNum++;
                 string serialNumber = "#" + objectSerialNumbers[o];
                 Write(serialNumber);
@@ -168,7 +168,7 @@ namespace Assets.Serialization
             // You've got the id # of the object.  Are we done now? 
             if (idObject.ContainsKey(id))
             {
-                return idObject[lastID];
+                return idObject[id];
             }
 
             // Assuming we aren't done, let's check to make sure there's a { next
@@ -192,6 +192,7 @@ namespace Assets.Serialization
 
             // Great!  Now what?
             object ReadObject = Utilities.MakeInstance(type);
+            idObject[id] = ReadObject;
 
             // Read the fields until we run out of them
             while (!End && PeekChar != '}')
@@ -207,8 +208,6 @@ namespace Assets.Serialization
             GetChar();  // Swallow close bracket
 
             // We're done.  Now what?
-            lastID = id;
-            idObject.Add(id, ReadObject);
             return ReadObject;
         }
     }
