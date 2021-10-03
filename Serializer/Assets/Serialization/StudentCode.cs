@@ -113,6 +113,8 @@ namespace Assets.Serialization
     // The partial keyword just means we're adding these three methods to the code in Deserializer.cs
     public partial class Deserializer
     {
+        IDictionary<int, object> idObject = new Dictionary<int, object>();
+        int lastID; 
         /// <summary>
         /// Read whatever data object is next in the stream
         /// </summary>
@@ -163,8 +165,11 @@ namespace Assets.Serialization
             var id = (int)ReadNumber(enclosingId);
             SkipWhitespace();
 
-            // You've got the id # of the object.  Are we done now?
-            throw new NotImplementedException("Fill me in");
+            // You've got the id # of the object.  Are we done now? 
+            if (idObject.ContainsKey(id))
+            {
+                return idObject[lastID];
+            }
 
             // Assuming we aren't done, let's check to make sure there's a { next
             SkipWhitespace();
@@ -186,14 +191,14 @@ namespace Assets.Serialization
                     $"Expected a type name (a string) in 'type: ...' expression for object id {id}, but instead got {typeName}");
 
             // Great!  Now what?
-            throw new NotImplementedException("Fill me in");
+            object ReadObject = Utilities.MakeInstance(type);
 
             // Read the fields until we run out of them
             while (!End && PeekChar != '}')
             {
                 var (field, value) = ReadField(id);
                 // We've got a field and a value.  Now what?
-                throw new NotImplementedException("Fill me in");
+                Utilities.SetFieldByName(ReadObject, field, value);
             }
 
             if (End)
@@ -202,7 +207,9 @@ namespace Assets.Serialization
             GetChar();  // Swallow close bracket
 
             // We're done.  Now what?
-            throw new NotImplementedException("Fill me in");
+            lastID = id;
+            idObject.Add(id, ReadObject);
+            return ReadObject;
         }
     }
 }
