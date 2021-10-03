@@ -12,6 +12,23 @@ namespace Assets.Serialization
     // The partial keyword just means we're adding these three methods to the code in Serializer.cs
     public partial class Serializer
     {
+        IDictionary<object, int> objectSerialNumbers = new Dictionary<object, int>();
+        int availableSerialNum = 0;
+
+        //private void InnerContent(object o)
+        //{
+        //    NewLine();
+        //    WriteField("type", o.GetType().Name, true);
+
+        //    IEnumerator var = Utilities.SerializedFields(o).GetEnumerator();
+        //    while (var.MoveNext())
+        //    {
+        //        KeyValuePair<string, object> curr = (KeyValuePair<string, object>)var.Current;
+        //        WriteField(curr.Key, curr.Value, false);
+        //    }
+        //}
+
+
         /// <summary>
         /// Print out the serialization data for the specified object.
         /// </summary>
@@ -21,30 +38,31 @@ namespace Assets.Serialization
             switch (o)
             {
                 case null:
-                    throw new NotImplementedException("Fill me in");
+                    string null_string = "null";
+                    Write(null_string);
                     break;
-
                 case int i:
-                    throw new NotImplementedException("Fill me in");
+                    Write(i);
                     break;
-
                 case float f:
-                    throw new NotImplementedException("Fill me in");
+                    Write(f);
                     break;
 
                 // BUG: this doesn't handle strings that themselves contain quote marks
                 // but that doesn't really matter for an assignment like this, so I'm not
                 // going to confuse the reader by complicating the code to escape the strings.
                 case string s:
-                    throw new NotImplementedException("Fill me in");
+                    const string quot_mark = "\"";
+                    s = quot_mark + s + quot_mark;
+                    Write(s);
                     break;
 
                 case bool b:
-                    throw new NotImplementedException("Fill me in");
+                    Write(b);
                     break;
 
                 case IList list:
-                    throw new NotImplementedException("Fill me in");
+                    WriteList(list);
                     break;
 
                 default:
@@ -64,7 +82,31 @@ namespace Assets.Serialization
         /// <param name="o">Object to serialize</param>
         private void WriteComplexObject(object o)
         {
-            throw new NotImplementedException("Fill me in");
+            if (objectSerialNumbers.ContainsKey(o))
+            {
+                string serialNumber = "#" + objectSerialNumbers[o];
+                Write(serialNumber);
+            }
+            else
+            {
+                objectSerialNumbers.Add(o, availableSerialNum);
+                availableSerialNum++;
+                string serialNumber = "#" + objectSerialNumbers[o];
+                Write(serialNumber);
+                WriteBracketedExpression("{",
+                    () =>
+                    {
+                        WriteField("type", o.GetType().Name, true);
+
+                        IEnumerator var = Utilities.SerializedFields(o).GetEnumerator();
+                        while (var.MoveNext())
+                        {
+                            KeyValuePair<string, object> curr = (KeyValuePair<string, object>)var.Current;
+                            WriteField(curr.Key, curr.Value, false);
+                        }
+                    }, 
+                    "}");
+            }
         }
     }
 
