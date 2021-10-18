@@ -26,6 +26,19 @@ public class Player : MonoBehaviour
     /// </summary>
     public float OrbVelocity = 10;
 
+    /// <summary>
+    /// Field for rigidbody component of player
+    /// </summary>
+    private Rigidbody2D rigidBodyPlayer;
+
+    /// <summary>
+    /// Start function in order to utilize the GetComponent for the rigidBody of the player
+    /// </summary>
+    void Start()
+    {
+        rigidBodyPlayer = GetComponent<Rigidbody2D>();
+    }
+
 
     /// <summary>
     /// Fire if the player is pushing the button for the Fire axis
@@ -37,7 +50,12 @@ public class Player : MonoBehaviour
     // ReSharper disable once UnusedMember.Local
     void Update()
     {
-        // TODO
+        if (Input.GetAxis("Fire") == 1)
+        {
+            var orb_obj = Instantiate(OrbPrefab, transform.localPosition, Quaternion.identity);
+            orb_obj.transform.localPosition = transform.localPosition + transform.right;
+            orb_obj.GetComponent<Rigidbody2D>().velocity = transform.right * OrbVelocity; 
+        }
     }
 
     /// <summary>
@@ -49,7 +67,10 @@ public class Player : MonoBehaviour
     // ReSharper disable once UnusedMember.Local
     void FixedUpdate()
     {
-        // TODO
+        var joystickDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        rigidBodyPlayer.AddForce(joystickDirection * EnginePower);
+        rigidBodyPlayer.angularVelocity = Input.GetAxis("Rotate") * RotateSpeed; 
+
     }
 
     /// <summary>

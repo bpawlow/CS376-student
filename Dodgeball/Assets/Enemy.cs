@@ -32,6 +32,11 @@ public class Enemy : MonoBehaviour
     public float CoolDownTime = 1;
 
     /// <summary>
+    /// Keep track of the checkpoints on when enemy fires a shot
+    /// </summary>
+    public float NextShot = 0;
+
+    /// <summary>
     /// Prefab for the orb it fires
     /// </summary>
     public GameObject OrbPrefab;
@@ -74,7 +79,11 @@ public class Enemy : MonoBehaviour
     // ReSharper disable once UnusedMember.Local
     void Update()
     {
-        // TODO
+        if (Time.time >= NextShot)
+        {
+            Fire();
+            NextShot += CoolDownTime; 
+        }
     }
 
     /// <summary>
@@ -83,7 +92,11 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private void Fire()
     {
-        // TODO
+        var newOrb = Instantiate(OrbPrefab, transform.localPosition, Quaternion.identity);
+        var orbPosition = new Vector3(HeadingToPlayer.x, HeadingToPlayer.y, transform.localPosition.z);
+        newOrb.transform.localPosition = transform.localPosition + orbPosition;
+        newOrb.GetComponent<Rigidbody2D>().velocity = HeadingToPlayer * OrbVelocity;
+        newOrb.GetComponent<Rigidbody2D>().mass = OrbMass;
     }
 
     /// <summary>
