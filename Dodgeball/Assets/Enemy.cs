@@ -34,7 +34,7 @@ public class Enemy : MonoBehaviour
     /// <summary>
     /// Keep track of the checkpoints on when enemy fires a shot
     /// </summary>
-    public float NextShot = 0;
+    public float NextShot;
 
     /// <summary>
     /// Prefab for the orb it fires
@@ -71,6 +71,7 @@ public class Enemy : MonoBehaviour
     {
         player = FindObjectOfType<Player>().transform;
         rigidBody = GetComponent<Rigidbody2D>();
+        NextShot = Time.time;
     }
 
     /// <summary>
