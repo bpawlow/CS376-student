@@ -22,7 +22,7 @@ public class Orb : MonoBehaviour
     // ReSharper disable once UnusedMember.Local
     void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject)
+        if (collision.collider.bounciness != 1)
         {
             Destroy(gameObject);
         }

@@ -50,7 +50,16 @@ public class ScoreKeeper : MonoBehaviour
     /// <param name="delta"></param>
     private void ScorePointsInternal(int delta)
     {
-        Score += delta;
-        scoreDisplay.text = Score.ToString();
+        if (delta == 0)
+        {
+            Singleton.Score = 0;
+            scoreDisplay.text = Singleton.Score.ToString();
+        }
+        else
+        {
+            Singleton.Score += delta;
+            scoreDisplay.text = Singleton.Score.ToString();
+        }
+        
     }
 }
