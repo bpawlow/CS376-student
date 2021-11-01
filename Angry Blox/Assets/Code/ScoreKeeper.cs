@@ -10,7 +10,6 @@ public class ScoreKeeper : MonoBehaviour {
     internal void Start () {
         scoreText = GetComponent<Text>();
         UpdateText();
-
     }
 
     public static void AddToScore(float points)

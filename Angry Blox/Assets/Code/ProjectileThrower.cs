@@ -24,6 +24,11 @@ public class ProjectileThrower : MonoBehaviour {
     private Vector3 springAttachmentPoint;
 
     /// <summary>
+    /// Accessing the Targets GameObject 
+    /// </summary>
+    //public GameObject Targets;
+
+    /// <summary>
     /// Where we are in the ready-aim-fire sequence.
     /// </summary>
     FiringState firingState = FiringState.Idle;
@@ -71,7 +76,30 @@ public class ProjectileThrower : MonoBehaviour {
     /// <returns></returns>
     bool WaitingForPhysicsToSettle()
     {
-        return true;  // Replace this
+        if (IsActive(myRigidBody)){
+            return true;
+        }
+
+        var listOfObjects = FindObjectsOfType<GameObject>();
+        foreach (var eachObject in listOfObjects)
+        {
+            if(eachObject.GetComponent<Rigidbody2D>() != null)
+            {
+                if (IsActive(eachObject))
+                {
+                    return true;
+                }
+            }
+            
+        }
+            //for (int x = 1; x <= Targets.transform.childCount; x++)
+            //{
+            //    var currTarget = Targets.transform.GetChild(x).gameObject; 
+            //    if (IsActive(currTarget)) {
+            //        return true;
+            //    }
+            //}
+            return false; 
     }
 
     /// <summary>
@@ -86,6 +114,14 @@ public class ProjectileThrower : MonoBehaviour {
     internal void Update()
     {
         FireControl();
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ResetForFiring();
+        }
+        if (firingState == FiringState.Firing && !WaitingForPhysicsToSettle())
+        {
+            ResetForFiring();
+        }
     }
 
     /// <summary>
