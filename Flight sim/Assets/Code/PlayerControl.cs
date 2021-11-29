@@ -85,12 +85,99 @@ public class PlayerControl : MonoBehaviour {
     internal void Start() {
         playerRB = GetComponent<Rigidbody>();
         playerRB.velocity = transform.forward*3;
+        roll = 0;
+        pitch = 0;
+        yaw = 0;
     }
 
-    /// <summary>
-    /// Show game-over display
-    /// </summary>
-    /// <param name="safe">True if we won, false if we crashed</param>
+    internal void FixedUpdate()
+
+    {
+        roll = Mathf.Lerp(roll, Input.GetAxis("Horizontal") * RollRange, 0.01f);
+        pitch = Mathf.Lerp(pitch, Input.GetAxis("Vertical") * PitchRange, 0.01f);
+        yaw += roll * RotationalSpeed * Time.fixedDeltaTime;
+
+        //input Mathlerp// 
+
+        playerRB.MoveRotation(Quaternion.Euler(pitch, yaw, roll));
+
+        var thrustVal = Input.GetAxis("Thrust");
+
+        if (thrustVal < 0f)
+        {
+            thrustVal = 0f;
+        }
+
+        thrust = thrustVal * MaximumThrust;
+
+        playerRB.AddForce(transform.forward * thrust);
+
+        var v_rel = -playerRB.velocity;
+
+        //Uplift
+
+        var array_colliders = Physics.OverlapSphere(transform.localPosition, 1f, UpdraftLayerMask);
+
+        if (array_colliders != null && array_colliders.Length != 0)
+        {
+            //Debug.Log(Physics.OverlapSphere(transform.localPosition, 1f, UpdraftLayerMask));
+            v_rel = GameObject.Find("Updraft").GetComponent<Updraft>().WindVelocity - playerRB.velocity; 
+        }
+
+        //lift 
+        var v_f = Vector3.Dot(v_rel, transform.forward);
+        ///Vector3 lift = new Vector3(0, 0, 0); 
+        var lift = LiftCoefficient * Mathf.Pow(v_f, 2) * transform.up;
+
+        //forward drag 
+        var forw_drag = ForwardDragCoefficient * Mathf.Pow(v_f, 2) * transform.forward;
+
+        if (v_f < 0)
+        {
+            forw_drag = -1 * forw_drag;
+        }
+
+        // Vertical drag 
+        var v_up = Vector3.Dot(v_rel, transform.up);
+
+        var vert_drag = VerticalDragCoefficient * Mathf.Pow(v_up, 2) * transform.up;
+
+        if (v_up < 0)
+        {
+            vert_drag = -1 * vert_drag;
+        }
+
+        //final addition of forces
+        var final_drag = forw_drag + vert_drag;
+        playerRB.AddForce(lift);
+        playerRB.AddForce(final_drag);
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        bool landed = false; 
+        if (collision.gameObject.name == "LandingPlatform")
+        {
+            //Debug.Log(collision.relativeVelocity.magnitude);
+            if (collision.relativeVelocity.magnitude <= GameObject.Find("LandingPlatform").GetComponent<LandingPlatform>().MaxLandingSpeed)
+            {
+                landed = true;
+                OnGameOver(landed);
+            }
+            else
+            {
+                OnGameOver(landed);
+            }
+        }
+        else
+        {
+            OnGameOver(landed);
+        }
+    }
+        /// <summary>
+        /// Show game-over display
+        /// </summary>
+        /// <param name="safe">True if we won, false if we crashed</param>
     private void OnGameOver(bool safe) {
         playerRB.velocity = Vector3.zero;
         playerRB.useGravity = false;

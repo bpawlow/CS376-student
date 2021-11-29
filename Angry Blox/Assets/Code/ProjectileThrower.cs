@@ -24,11 +24,6 @@ public class ProjectileThrower : MonoBehaviour {
     private Vector3 springAttachmentPoint;
 
     /// <summary>
-    /// Accessing the Targets GameObject 
-    /// </summary>
-    //public GameObject Targets;
-
-    /// <summary>
     /// Where we are in the ready-aim-fire sequence.
     /// </summary>
     FiringState firingState = FiringState.Idle;
@@ -92,13 +87,6 @@ public class ProjectileThrower : MonoBehaviour {
             }
             
         }
-            //for (int x = 1; x <= Targets.transform.childCount; x++)
-            //{
-            //    var currTarget = Targets.transform.GetChild(x).gameObject; 
-            //    if (IsActive(currTarget)) {
-            //        return true;
-            //    }
-            //}
             return false; 
     }
 
