@@ -95,7 +95,7 @@ public class PlayerControl : MonoBehaviour {
     {
         roll = Mathf.Lerp(roll, Input.GetAxis("Horizontal") * RollRange, 0.01f);
         pitch = Mathf.Lerp(pitch, Input.GetAxis("Vertical") * PitchRange, 0.01f);
-        yaw += roll * RotationalSpeed * Time.fixedDeltaTime;
+        yaw -= roll * RotationalSpeed * Time.fixedDeltaTime;
 
         //input Mathlerp// 
 
